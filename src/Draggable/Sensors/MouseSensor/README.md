@@ -24,3 +24,6 @@ Detaches sensors to the DOM
 
 **`delay {Number}`**  
 This value will delay touch start
+
+**`tresholdDistance {Number}`**  
+This value is number of pixels to allow movement before drag starts.

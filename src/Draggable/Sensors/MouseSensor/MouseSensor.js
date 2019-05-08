@@ -44,6 +44,11 @@ export default class MouseSensor extends Sensor {
      */
     this.openedContextMenu = false;
 
+    /**
+     * Handler that checks for change of distance in pixels before drag.
+     */
+    this.distanceHandler = null;
+
     this[onContextMenuWhileDragging] = this[onContextMenuWhileDragging].bind(this);
     this[onMouseDown] = this[onMouseDown].bind(this);
     this[onMouseMove] = this[onMouseMove].bind(this);
@@ -87,11 +92,12 @@ export default class MouseSensor extends Sensor {
 
     this.mouseDown = true;
 
-    clearTimeout(this.mouseDownTimeout);
-    this.mouseDownTimeout = setTimeout(() => {
+    const triggerStartEvent = () => {
       if (!this.mouseDown) {
         return;
       }
+
+      document.removeEventListener('mousemove', this.distanceHandler);
 
       const dragStartEvent = new DragStartSensorEvent({
         clientX: event.clientX,
@@ -110,7 +116,26 @@ export default class MouseSensor extends Sensor {
         document.addEventListener('contextmenu', this[onContextMenuWhileDragging]);
         document.addEventListener('mousemove', this[onMouseMove]);
       }
-    }, this.options.delay);
+    };
+
+    if (this.options.tresholdDistance) {
+      this.distanceHandler = (moveEvent) => {
+        // console.log('received events', moveEvent, event.clientX, event.clientY)
+        const distance = Math.sqrt(
+          Math.pow(event.clientX - moveEvent.clientX, 2) + Math.pow(event.clientY - moveEvent.clientY, 2),
+        );
+
+        if (distance >= this.options.tresholdDistance) {
+          clearTimeout(this.mouseDownTimeout);
+          triggerStartEvent();
+        }
+      };
+
+      document.addEventListener('mousemove', this.distanceHandler);
+    }
+
+    clearTimeout(this.mouseDownTimeout);
+    this.mouseDownTimeout = setTimeout(triggerStartEvent, this.options.delay);
   }
 
   /**
@@ -151,6 +176,7 @@ export default class MouseSensor extends Sensor {
 
     document.removeEventListener('mouseup', this[onMouseUp]);
     document.removeEventListener('dragstart', preventNativeDragStart);
+    document.removeEventListener('mousemove', this.distanceHandler);
 
     if (!this.dragging) {
       return;

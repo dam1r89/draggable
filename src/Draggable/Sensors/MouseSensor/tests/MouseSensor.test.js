@@ -164,4 +164,20 @@ describe('MouseSensor', () => {
 
     releaseMouse(document.body);
   });
+
+  it('trigger `drag:start` event before timeout when distance is changed', () => {
+    function slightMoveFlow() {
+      clickMouse(draggableElement, {clientX: 5, clientY: 5});
+      moveMouse(document.body, {clientX: 6, clientY: 6});
+    }
+
+    function startDragMoveFlow() {
+      clickMouse(draggableElement, {clientX: 5, clientY: 5});
+      moveMouse(document.body, {clientX: 8, clientY: 5});
+    }
+
+    expect(slightMoveFlow).not.toHaveTriggeredSensorEvent('drag:start');
+
+    expect(startDragMoveFlow).toHaveTriggeredSensorEvent('drag:start');
+  });
 });
