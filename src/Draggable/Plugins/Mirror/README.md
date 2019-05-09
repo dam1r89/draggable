@@ -94,3 +94,12 @@ const sortable = new Sortable(document.querySelectorAll('ul'), {
   }
 });
 ```
+
+#### Additional options passed through element
+
+```html
+<ul>
+  <li data-draggable-mirror="{\"xAxis\": false}" > Only Y axis </li>
+  <li> Free movement </li>
+</ul>
+```

@@ -124,6 +124,15 @@ export default class Mirror extends AbstractPlugin {
     return this.draggable.options.mirror || {};
   }
 
+  /**
+   * Returns options passed through additional
+   * options passed in though element data-draggable-mirror
+   * @return {Object}
+   */
+  getExtendedOptions(element) {
+    return {...this.options, ...JSON.parse(element.dataset.draggableMirror || '{}')}
+  }
+
   [onDragStart](dragEvent) {
     if (dragEvent.canceled()) {
       return;
@@ -257,7 +266,7 @@ export default class Mirror extends AbstractPlugin {
       sensorEvent,
       mirrorClass,
       scrollOffset: this.scrollOffset,
-      options: this.options,
+      options: this.getExtendedOptions(source),
     };
 
     return (
@@ -288,7 +297,7 @@ export default class Mirror extends AbstractPlugin {
       mirror: mirrorEvent.mirror,
       sensorEvent: mirrorEvent.sensorEvent,
       mirrorOffset: this.mirrorOffset,
-      options: this.options,
+      options: this.getExtendedOptions(mirrorEvent.source),
       initialX: this.initialX,
       initialY: this.initialY,
       scrollOffset: this.scrollOffset,
