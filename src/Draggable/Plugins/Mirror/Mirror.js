@@ -314,7 +314,7 @@ export default class Mirror extends AbstractPlugin {
    * @return {HTMLElement}
    */
   [getAppendableContainer](source) {
-    const appendTo = this.options.appendTo;
+    const appendTo = this.getExtendedOptions(source).appendTo;
 
     if (typeof appendTo === 'string') {
       return document.querySelector(appendTo);
