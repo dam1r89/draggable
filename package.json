@@ -1,12 +1,12 @@
 {
-  "name": "@shopify/draggable",
-  "version": "1.0.0-beta.8",
+  "name": "@startinfinity/draggable",
+  "version": "1.0.0-beta.11",
   "private": false,
   "license": "MIT",
   "description": "The JavaScript Drag & Drop library your grandparents warned you about.",
   "author": "Shopify <dev@shopify.com>",
-  "homepage": "https://github.com/Shopify/draggable#readme",
-  "repository": "https://github.com/Shopify/draggable",
+  "homepage": "https://github.com/dam1r89/draggable#readme",
+  "repository": "https://github.com/dam1r89/draggable",
   "contributors": [
     {
       "name": "Max Hoffmann",
