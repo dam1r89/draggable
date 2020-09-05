@@ -118,10 +118,10 @@ export default class Scrollable extends AbstractPlugin {
    * @return {HTMLElement}
    */
   getScrollableElement(target) {
-    if (this.hasDefinedScrollableElements()) {
+    if (this.hasDefinedScrollableElements() || !this.currentMousePosition) {
       return closest(target, this.options.scrollableElements) || document.documentElement;
     } else {
-      return closestScrollableElement(target);
+      return closestScrollableElement(target, this.currentMousePosition, this.options.sensitivity);
     }
   }
 
@@ -256,7 +256,7 @@ export default class Scrollable extends AbstractPlugin {
  * @return {Boolean}
  * @private
  */
-function hasOverflow(element) {
+function hasOverflow(element, {clientX, clientY}, sensitivity) {
   const overflowRegex = /(auto|scroll)/;
   const computedStyles = getComputedStyle(element, null);
 
@@ -265,7 +265,33 @@ function hasOverflow(element) {
     computedStyles.getPropertyValue('overflow-y') +
     computedStyles.getPropertyValue('overflow-x');
 
-  return overflowRegex.test(overflow);
+  if (overflowRegex.test(overflow)) {
+    const box = element.getBoundingClientRect();
+    if (
+      clientX < box.left + sensitivity &&
+      element.scrollLeft > 0
+    ) {
+      return element;
+    }
+    if (
+      clientX > box.right - sensitivity &&
+      element.scrollLeft < element.scrollWidth - element.clientWidth
+    ) {
+      return element;
+    }
+    if (
+      clientY < box.top + sensitivity &&
+      element.scrollTop > 0
+    ) {
+      return element;
+    }
+    if (
+      clientY > box.bottom - sensitivity &&
+      element.scrollTop < element.scrollHeight - element.clientHeight
+    ) {
+      return element;
+    }
+  }
 }
 
 /**
@@ -285,7 +311,7 @@ function isStaticallyPositioned(element) {
  * @return {HTMLElement}
  * @private
  */
-function closestScrollableElement(element) {
+function closestScrollableElement(element, mousePosition, sensitivity) {
   if (!element) {
     return getDocumentScrollingElement();
   }
@@ -297,7 +323,7 @@ function closestScrollableElement(element) {
     if (excludeStaticParents && isStaticallyPositioned(parent)) {
       return false;
     }
-    return hasOverflow(parent);
+    return hasOverflow(parent, mousePosition, sensitivity);
   });
 
   if (position === 'fixed' || !scrollableElement) {
